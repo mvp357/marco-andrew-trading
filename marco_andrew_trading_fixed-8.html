@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Marco Andrew Trading</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
+header{height:68px;background:#0b1220;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 22px}
+.brand{font-weight:800;font-size:18px}.brand b{color:#55d98b}.badge,.pill{font-size:12px;font-weight:700;border-radius:20px;padding:6px 10px}.badge{background:#25324a}
+main{max-width:1100px;margin:auto;padding:30px 18px}.screen{display:none}.screen.active{display:block}
+.auth{max-width:470px;margin:35px auto}.hero{text-align:center;margin-bottom:22px}.hero h1{font-size:30px;margin:10px 0}.muted{color:#69758a}
+.card,.stat{background:white;border:1px solid #e2e8f0;border-radius:16px;padding:22px;box-shadow:0 8px 25px #13233d0d}
+label{display:block;font-size:13px;font-weight:bold;margin:15px 0 7px}
+input,select{width:100%;padding:12px;border:1px solid #ccd5e3;border-radius:10px;background:white}
+.btn{border:0;border-radius:10px;padding:11px 15px;cursor:pointer;font-weight:700}.primary{background:#1769ff;color:white}.success{background:#18a56a;color:white}.danger{background:#d84b5b;color:white}.ghost{background:#edf2f8;color:#26344b}.full{width:100%;margin-top:15px}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}.title{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.title h2{margin:0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.stat small{color:#69758a}.stat strong{display:block;font-size:25px;margin-top:7px}
+.notice{padding:14px;border-radius:10px;background:#edf6ff;margin:14px 0}.warning{background:#fff5dc}.error{color:#c52f42;font-size:13px;margin-bottom:8px}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px 9px;border-bottom:1px solid #edf0f5;font-size:14px}th{font-size:12px;color:#69758a;text-transform:uppercase}
+.pending{background:#fff0c7}.approved{background:#dff7ea;color:#087446}.rejected{background:#ffe2e5;color:#9d2635}
+.actions{display:flex;gap:6px;flex-wrap:wrap}.empty{text-align:center;padding:30px;color:#69758a}
+.footer{text-align:center;color:#7b8799;font-size:12px;margin-top:25px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.card{padding:18px}}
+</style>
+</head>
+<body>
+<header><div class="brand">Marco Andrew <b>Trading</b></div><div class="badge">SECURE ACCOUNT</div></header>
+<main>
+
+<section id="landing" class="screen active"><div class="auth">
+<div class="hero"><h1>Secure Account Access</h1><p class="muted">Create an account and wait for administrator approval before accessing your account.</p></div>
+<div class="card"><button class="btn primary full" onclick="show('login')">Log in</button><button class="btn ghost full" onclick="show('register')">Create Account</button></div>
+<div class="footer">Prototype interface • Payment processing is not connected</div></div></section>
+
+<section id="login" class="screen"><div class="auth"><div class="hero"><h1>Welcome Back</h1><p class="muted">Log in to your approved account.</p></div>
+<div class="card"><div id="loginError" class="error"></div><label>Email</label><input id="loginEmail" type="email" placeholder="you@example.com"><label>Password</label><input id="loginPass" type="password" placeholder="Password"><button type="button" class="btn primary full" onclick="login()">Log in</button><button type="button" class="btn ghost full" onclick="show('register')">Register</button><p class="muted" style="font-size:12px">Admin: admin@marco-demo.local / admin123</p></div></div></section>
+
+<section id="register" class="screen"><div class="auth"><div class="hero"><h1>Create Account</h1><p class="muted">Your account must be approved by the administrator.</p></div>
+<div class="card"><div id="regError" class="error"></div><label>Full name</label><input id="regName" placeholder="Your full name"><label>Email</label><input id="regEmail" type="email" placeholder="you@example.com"><label>Phone number</label><input id="regPhone" type="tel" placeholder="+234 800 000 0000"><label>Country</label><input id="regCountry" placeholder="Country"><label>Password</label><input id="regPass" type="password" placeholder="At least 6 characters"><label>Confirm password</label><input id="regConfirm" type="password"><button class="btn primary full" onclick="register()">Submit Registration</button><button class="btn ghost full" onclick="show('login')">Back to Login</button></div></div></section>
+
+<section id="pending" class="screen"><div class="auth"><div class="hero"><h1>Approval Pending</h1><p class="muted">Your registration was received.</p></div><div class="card"><div class="notice warning"><b>Your account is awaiting administrator approval.</b><br>Dashboard access will become available after approval.</div><button class="btn primary full" onclick="show('login')">Return to Login</button></div></div></section>
+
+<section id="admin" class="screen"><div class="nav"><button class="btn primary" onclick="show('admin')">Admin Panel</button><button class="btn ghost" onclick="show('adminDash')">My Account</button><button class="btn primary" onclick="renderAdmin()">Users</button><button class="btn ghost" onclick="logout()">Log out</button></div>
+<div class="title"><div><h2>Admin Approval</h2><p class="muted">Review account registrations.</p></div></div><div class="card"><div id="userTable"></div></div></section>
+
+
+<section id="adminDash" class="screen">
+<div class="nav"><button class="btn primary" onclick="show('admin')">Admin Panel</button><button class="btn ghost" onclick="logout()">Log out</button></div>
+<div class="title"><div><h2>Administrator Account</h2><p class="muted">Your own account dashboard.</p></div><span class="pill approved">ADMIN</span></div>
+<div class="grid"><div class="stat"><small>Account balance</small><strong id="adminBalance">$0.00</strong></div><div class="stat"><small>Deposit total</small><strong id="adminDeposits">$0.00</strong></div><div class="stat"><small>Withdrawal total</small><strong id="adminWithdrawals">$0.00</strong></div></div>
+<div class="card"><h3>Administrator Controls</h3><p class="muted">Select a registered user below to adjust their prototype account balance.</p><div id="controlUsers"></div></div>
+</section>
+
+<section id="dashboard" class="screen"><div class="nav"><button class="btn primary" onclick="show('dashboard')">Dashboard</button><button class="btn success" onclick="show('deposit')">Deposit</button><button class="btn danger" onclick="show('withdraw')">Withdraw</button><button class="btn ghost" onclick="show('history')">Transactions</button><button class="btn ghost" onclick="logout()">Log out</button></div>
+<div class="title"><div><h2>Account Dashboard</h2><p class="muted">Paper-trading account for <b id="dashName"></b></p></div><span class="pill approved">APPROVED</span></div>
+<div class="grid"><div class="stat"><small>Account balance</small><strong id="balance">$10,000.00</strong></div><div class="stat"><small>Account activity</small><strong id="pnl">$0.00</strong></div><div class="stat"><small>Transactions</small><strong id="tradeCount">0</strong></div></div>
+<div class="card" style="margin-top:15px"><h3>Account Activity</h3><p class="muted">This prototype records account activity only.</p>
+</div></section>
+
+
+<section id="deposit" class="screen">
+<div class="nav"><button class="btn primary" onclick="show('dashboard')">Dashboard</button><button class="btn ghost" onclick="show('history')">Transactions</button><button class="btn ghost" onclick="logout()">Log out</button></div>
+<div class="auth"><div class="hero"><h1>Deposit</h1><p class="muted">Submit an account deposit request.</p></div>
+<div class="card"><div id="depositMsg" class="error"></div><label>Amount</label><input id="depositAmount" type="number" min="1" placeholder="Enter amount">
+<label>Payment method</label><select id="depositMethod"><option>Bank transfer</option><option>Card</option><option>Other</option></select>
+<button class="btn success full" onclick="submitMoney('deposit')">Submit Deposit</button></div></div></section>
+
+<section id="withdraw" class="screen">
+<div class="nav"><button class="btn primary" onclick="show('dashboard')">Dashboard</button><button class="btn ghost" onclick="show('history')">Transactions</button><button class="btn ghost" onclick="logout()">Log out</button></div>
+<div class="auth"><div class="hero"><h1>Withdraw</h1><p class="muted">Submit an account withdrawal request.</p></div>
+<div class="card"><div id="withdrawMsg" class="error"></div><label>Amount</label><input id="withdrawAmount" type="number" min="1" placeholder="Enter amount">
+<label>Withdrawal method</label><select id="withdrawMethod"><option>Bank transfer</option><option>Other</option></select>
+<button class="btn danger full" onclick="submitMoney('withdraw')">Submit Withdrawal</button></div></div></section>
+
+<section id="history" class="screen"><div class="nav"><button class="btn primary" onclick="show('dashboard')">Dashboard</button><button class="btn ghost" onclick="logout()">Log out</button></div>
+<div class="title"><div><h2>Transactions</h2><p class="muted">Simulated activity for your account.</p></div></div><div class="card"><div id="historyTable"></div></div></section>
+
+</main>
+<script>
+const KEY='mat_demo_users_v3',SESSION='mat_session_v3';
+const admin={email:'admin@marco-demo.local',password:'admin123'};
+function users(){return JSON.parse(localStorage.getItem(KEY)||'[]')}
+function save(x){localStorage.setItem(KEY,JSON.stringify(x))}
+function show(id){const target=document.getElementById(id);if(!target)return;document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));target.classList.add('active');if(id==='admin')renderAdmin();if(id==='adminDash')renderAdminDash();if(id==='dashboard')renderDash();if(id==='history')renderHistory()}
+function register(){
+let n=regName.value.trim(),e=regEmail.value.trim().toLowerCase(),ph=regPhone.value.trim(),co=regCountry.value.trim(),p=regPass.value,c=regConfirm.value;
+document.getElementById('regError').textContent='';
+if(!n||!e||!ph||!co||p.length<6||p!==c){regError.textContent='Please complete all fields and make sure the passwords match (6+ characters).';return}
+let u=users();
+if(u.some(x=>x.email===e)||e===admin.email){document.getElementById('regError').textContent='That email is already registered.';return}
+u.push({id:Date.now(),name:n,email:e,phone:ph,country:co,password:p,status:'pending',balance:0,deposits:0,withdrawals:0,transactions:[]});
+save(u);sessionStorage.setItem(SESSION,e);show('pending')}
+function login(){
+let e=loginEmail.value.trim().toLowerCase(),p=loginPass.value;document.getElementById('loginError').textContent='';
+if(e===admin.email&&p===admin.password){sessionStorage.setItem(SESSION,'ADMIN');show('admin');return}
+let x=users().find(a=>a.email===e);if(!x||x.password!==p){document.getElementById('loginError').textContent='Invalid email or password.';return}
+sessionStorage.setItem(SESSION,e);if(x.status==='approved')show('dashboard');else if(x.status==='pending')show('pending');else loginError.textContent='Your account was rejected. Please contact the administrator.'}
+function current(){let x=users().find(x=>x.email===sessionStorage.getItem(SESSION));if(x){x.transactions=x.transactions||[];x.deposits=x.deposits||0;x.withdrawals=x.withdrawals||0;x.balance=Number(x.balance||0)}return x}
+function logout(){sessionStorage.removeItem(SESSION);show('landing')}
+function renderAdmin(){
+const u=users();
+if(!u.length){
+  document.getElementById('userTable').innerHTML='<div class="empty">No registrations yet.</div>';
+  return;
+}
+document.getElementById('userTable').innerHTML=`
+<table>
+<thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Country</th><th>Status</th><th>Balance</th><th>Action</th></tr></thead>
+<tbody>
+${u.map(x=>`
+<tr>
+<td>${esc(x.name)}</td>
+<td>${esc(x.email)}</td>
+<td>${esc(x.phone||'')}</td>
+<td>${esc(x.country||'')}</td>
+<td><span class="pill ${x.status}">${x.status.toUpperCase()}</span></td>
+<td>$${Number(x.balance||0).toFixed(2)}</td>
+<td class="actions">
+${x.status!=='approved'?`<button class="btn success" onclick="setStatus(${x.id},'approved')">Approve</button>`:''}
+${x.status!=='rejected'?`<button class="btn danger" onclick="setStatus(${x.id},'rejected')">Reject</button>`:''}
+${x.status==='approved'?`<button class="btn blue" onclick="adjustBalance(${x.id},1)">+ Balance</button><button class="btn dark" onclick="adjustBalance(${x.id},-1)">− Balance</button>`:''}
+</td>
+</tr>`).join('')}
+</tbody></table>`;
+}
+function adjustBalance(id,dir){
+let u=users(),x=u.find(a=>a.id===id);if(!x)return;
+let raw=prompt((dir>0?'Increase':'Decrease')+' balance for '+x.name+' by how much?','100');
+let amt=Number(raw);if(!amt||amt<=0)return;
+x.balance=Number(x.balance||0)+(dir*amt);
+if(x.balance<0)x.balance=0;
+x.transactions=x.transactions||[];
+x.transactions.unshift({date:new Date().toLocaleString(),type:dir>0?'BALANCE INCREASE':'BALANCE DECREASE',amount:amt,method:'Admin adjustment',status:'Completed'});
+save(u);renderAdmin();
+}
+function renderAdminDash(){
+let b=Number(localStorage.getItem('marco_admin_balance')||0);
+adminBalance.textContent='$'+b.toLocaleString(undefined,{minimumFractionDigits:2});
+adminDeposits.textContent='$0.00';adminWithdrawals.textContent='$0.00';
+controlUsers.innerHTML=users().map(x=>'<div class="card" style="margin:10px 0"><b>'+esc(x.name)+'</b><div class="muted">'+esc(x.email)+' • '+esc(x.country||'')+'</div><h3>$'+Number(x.balance||0).toFixed(2)+'</h3><div class="actions"><button class="btn success" onclick="adjustBalance('+x.id+',1);renderAdminDash()">Increase</button><button class="btn danger" onclick="adjustBalance('+x.id+',-1);renderAdminDash()">Decrease</button></div></div>').join('')||'<div class="empty">No users yet.</div>';
+}
+function setStatus(id,s){let u=users(),x=u.find(a=>a.id===id);if(x){x.status=s;save(u);renderAdmin()}}
+function renderDash(){
+let x=current();if(!x||x.status!=='approved'){show('login');return}
+x.transactions=x.transactions||[];x.deposits=x.deposits||0;x.withdrawals=x.withdrawals||0;
+dashName.textContent=x.name;
+balance.textContent='$'+Number(x.balance||0).toLocaleString(undefined,{minimumFractionDigits:2});
+if(document.getElementById('depTotal'))document.getElementById('depTotal').textContent='$'+Number(x.deposits||0).toLocaleString(undefined,{minimumFractionDigits:2});
+if(document.getElementById('withTotal'))document.getElementById('withTotal').textContent='$'+Number(x.withdrawals||0).toLocaleString(undefined,{minimumFractionDigits:2});
+}
+function renderHistory(){let x=current();if(!x)return;historyTable.innerHTML=x.trades.length?'<table><thead><tr><th>Date</th><th>Asset</th><th>Direction</th><th>Amount</th></tr></thead><tbody>'+x.trades.map(t=>'<tr><td>'+esc(t.date)+'</td><td>'+esc(t.asset)+'</td><td>'+esc(t.direction)+'</td><td>$'+Number(t.amount).toFixed(2)+'</td></tr>').join('')+'</tbody></table>':'<div class="empty">No paper trades recorded yet.</div>'}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+</script>
+</body></html>
